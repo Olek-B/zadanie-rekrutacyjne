@@ -24,7 +24,8 @@ jobs:
           set -a
           source .vercel/.env.preview.local
           set +a
-
+      - name: Check environment
+        run: echo "Secret = $PAYLOAD_SECRET"
       - name: Run Payload Migrations
         run: npm run payload migrate
       - name: Build Project Artifacts
