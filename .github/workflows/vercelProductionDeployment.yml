@@ -1,9 +1,9 @@
-name: Vercel Preview Deployment
+name: Vercel Production Deployment
 
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
       - master
       
@@ -20,17 +20,14 @@ jobs:
       - name: Install Payload CLI
         run: npm install --global payload@latest
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Pull Vercel Environment Variables
-        run: vercel env pull .env --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel env pull .env --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Load Env File
         run: |
           set -a
           source .env
           set +a
-
-      - name: Check environment
-        run: echo "Secret = $PAYLOAD_SECRET"
       - name: Run Payload Migrations
         run: npm run payload migrate
       - name: Build Project Artifacts
