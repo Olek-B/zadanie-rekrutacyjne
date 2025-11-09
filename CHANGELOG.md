@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Olek-B/zadanie-rekrutacyjne/compare/v1.2.0...v1.3.0) (2025-11-09)
+
+
+### Features
+
+* removed useles stuff ([64e52bd](https://github.com/Olek-B/zadanie-rekrutacyjne/commit/64e52bdc4ed2767b9a4fea352c262242b797120f))
+
 # [1.2.0](https://github.com/Olek-B/zadanie-rekrutacyjne/compare/v1.1.0...v1.2.0) (2025-11-09)
 
 
