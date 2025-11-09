@@ -1,18 +1,16 @@
 name: Vercel Production Deployment
 
-
 on:
   push:
     branches:
       - main
       - master
       
-
 jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # to be able to publish a GitHub release
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -30,7 +28,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Pull Vercel Environment Variables
         run: vercel env pull .env --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Load Env File
+      - name: Load Vercel Env File
         run: |
           set -a
           source .env
@@ -39,7 +37,7 @@ jobs:
         run: npm run payload migrate
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Semantic Release
+      - name: Run Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
