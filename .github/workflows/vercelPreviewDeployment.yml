@@ -18,6 +18,8 @@ jobs:
         run: npm install --global vercel@latest
       - name: Install Payload CLI
         run: npm install --global payload@latest
+      - name: Install env
+        run: npm install cross-env
       - name: Run Payload Migrations
         run: npm run payload migrate
       - name: Pull Vercel Environment Information
