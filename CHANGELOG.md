@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/Olek-B/zadanie-rekrutacyjne/compare/v1.1.0...v1.2.0) (2025-11-09)
+
+
+### Bug Fixes
+
+* fixed stuff ([51cfac9](https://github.com/Olek-B/zadanie-rekrutacyjne/commit/51cfac9f408cc9d680139b47c417b457283df8fb))
+
+
+### Features
+
+* added stuff ([9a49d86](https://github.com/Olek-B/zadanie-rekrutacyjne/commit/9a49d864fc379e38f717279f677df16e132413da))
+
 # [1.1.0](https://github.com/Olek-B/zadanie-rekrutacyjne/compare/v1.0.1...v1.1.0) (2025-11-09)
 
 
