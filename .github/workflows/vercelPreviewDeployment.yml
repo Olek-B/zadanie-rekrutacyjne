@@ -10,7 +10,7 @@ jobs:
   Deploy-Preview:
     strategy:
       matrix:
-        theme-color: ['ff0000', '00ff00', '0000ff']
+        theme_color: ['ff0000', '00ff00', '0000ff']
     runs-on: ubuntu-latest
 
     steps:
@@ -61,7 +61,7 @@ jobs:
       - name: Run Payload Migrations Once
 
         run: |
-          if [ "${{ matrix.theme_color }}" == "ff0000" ]; then
+          if [ "${{ matrix.theme_color }}" = "ff0000" ]; then
             npm run payload migrate
           fi
       - name: add envirement variables
@@ -69,14 +69,8 @@ jobs:
       - name: ReLoad Env File
 
         run: |
-
-
           set -a
-
-
           source .env
-
-
           set +a
 
       - name: Build Project Artifacts
@@ -90,4 +84,4 @@ jobs:
           echo "preview_url=$DEPLOY_URL" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy Sucessful Message
-        run: echo "### Preview for ${{ matrix.color }} is ready! 🚀" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Preview for ${{ matrix.theme_color }} is ready! 🚀" >> $GITHUB_STEP_SUMMARY
