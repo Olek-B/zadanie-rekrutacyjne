@@ -55,10 +55,8 @@ jobs:
 
 
           set +a
-
-      - name: Check environment
-
-        run: echo "Secret = $PAYLOAD_SECRET"
+      - name: add envirement variable
+        run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND='#fffae6'" >> .env
 
       - name: Run Payload Migrations
 
