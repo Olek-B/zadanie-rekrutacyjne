@@ -4,79 +4,70 @@ on:
   push:
     branches-ignore:
       - main
+
       - master
 
 jobs:
   Deploy-Preview:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+
+        uses: actions/setup-node@v4
+
         with:
-          node-version: '20'
+          node-version: '22.14.0'
+
           cache: 'npm'
 
-      - run: npm ci
+      - name: Install Vercel CLI
 
-      - run: npm install --global vercel@latest payload@latest
+        run: npm install --global vercel@latest
 
-      - name: Pull Vercel project settings (preview)
+      - name: Install dependencies
+
+        run: npm ci
+
+      - name: Install Payload CLI
+
+        run: npm install --global payload@latest
+
+      - name: Pull Vercel Environment Information
+
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Pull Vercel env vars (preview) to .env
+      - name: Pull Vercel Environment Variables
+
         run: vercel env pull .env --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Load env vars into GitHub Actions environment
+      - name: Load Env File
+
         run: |
-          # Append only valid KEY=VALUE lines from the pulled .env into $GITHUB_ENV.
-          # The Vercel CLI may add comment lines (e.g. "# Created by Vercel CLI") or
-          # other non KEY=VALUE lines which are not valid for $GITHUB_ENV and will
-          # cause errors like "Invalid format".
-          #
-          # Processing steps:
-          #  - Remove BOM if present
-          #  - Strip any leading "export " prefixes
-          #  - Trim leading/trailing whitespace
-          #  - Remove blank lines and comment lines
-          #  - Only keep lines that start with a valid env var identifier followed by '='
-          if [ -f .env ]; then
-            # Use a pipeline of tools to sanitize the .env content before appending.
-            sed -E '1s/^\xEF\xBB\xBF//' .env \
-              | sed -E 's/^[[:space:]]*export[[:space:]]+//I' \
-              | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' \
-              | grep -v -E '^[[:space:]]*#' \
-              | sed '/^[[:space:]]*$/d' \
-              | grep -E '^[A-Za-z_][A-Za-z0-9_]*=' \
-              >> $GITHUB_ENV
-          else
-            echo ".env not found after vercel env pull"
-          fi
 
-      - name: Optional debug: list loaded env keys (non-sensitive)
-        if: always()
-        run: |
-          # List the keys we've loaded into the environment for debugging purposes.
-          # Avoid printing values to prevent accidental secret leakage.
-          echo "Loaded env keys from .env (showing names only):"
-          grep -Eo '^[A-Za-z_][A-Za-z0-9_]*=' .env | sed 's/=$//' | sort | uniq || true
 
-      - name: Run database migrations
-        run: payload migrate
+          set -a
 
-      # Optional: If you want to provide a fallback build-time value inside the CI (not recommended for secrets),
-      # you can uncomment the next line or set the value in the Vercel Dashboard.
-      # - run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=#ffff00" >> $GITHUB_ENV
 
-      - name: Build (with explicit env passed)
+          source .env
+
+
+          set +a
+
+      - name: Check environment
+
+        run: echo "Secret = $PAYLOAD_SECRET"
+
+      - name: Run Payload Migrations
+
+        run: npm run payload migrate
+
+      - name: Build Project Artifacts
+
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          # Ensure NEXT_PUBLIC_STARTUP_BACKGROUND is present in the build environment.
-          # This value comes from the .env pulled earlier and loaded into $GITHUB_ENV.
-          NEXT_PUBLIC_STARTUP_BACKGROUND: ${{ env.NEXT_PUBLIC_STARTUP_BACKGROUND }}
-          # Add other build-time environment variables here as needed:
-          # ANOTHER_VAR: ${{ env.ANOTHER_VAR }}
 
-      - name: Deploy (prebuilt)
+      - name: Deploy Project Artifacts to Vercel
+
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-        # The deploy step will use the built output. Vercel runtime envs are configured in the Vercel dashboard.
