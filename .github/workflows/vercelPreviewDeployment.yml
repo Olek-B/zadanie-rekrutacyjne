@@ -55,7 +55,7 @@ jobs:
 
 
           set +a
-      - name: add envirement variable
+      - name: add envirement variables
         run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND='#fffae6'" >> .env
 
       - name: Run Payload Migrations
