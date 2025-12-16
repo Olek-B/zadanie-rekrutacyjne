@@ -29,7 +29,6 @@ jobs:
 
       - name: Load env vars into GitHub Actions environment
         run: |
-          # Append the pulled .env into $GITHUB_ENV so subsequent steps can access them via ${{ env.NAME }}
           if [ -f .env ]; then
             cat .env >> $GITHUB_ENV
           else
