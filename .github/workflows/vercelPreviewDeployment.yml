@@ -66,6 +66,18 @@ jobs:
           fi
       - name: add envirement variables
         run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=${{ matrix.theme_color }}" >> .env
+      - name: ReLoad Env File
+
+        run: |
+
+
+          set -a
+
+
+          source .env
+
+
+          set +a
 
       - name: Build Project Artifacts
 
