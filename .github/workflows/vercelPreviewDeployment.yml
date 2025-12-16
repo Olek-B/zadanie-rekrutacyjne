@@ -9,6 +9,9 @@ on:
 
 jobs:
   Deploy-Preview:
+    strategy:
+      matrix:
+        theme-color: ['ff0000', '00ff00', '0000ff']
     runs-on: ubuntu-latest
 
     steps:
@@ -55,12 +58,15 @@ jobs:
 
 
           set +a
-      - name: add envirement variable
-        run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND='#fffae6'" >> .env
 
-      - name: Run Payload Migrations
+      - name: Run Payload Migrations Once
 
-        run: npm run payload migrate
+        run: |
+          if [ ${{ matrix.theme_color }} == 'ff0000' ]; then
+            npm run payload migrate
+
+      - name: add envirement variables
+        run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=${{ matrix.theme_color }}" >> .env
 
       - name: Build Project Artifacts
 
