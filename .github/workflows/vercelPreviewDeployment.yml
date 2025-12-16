@@ -75,3 +75,6 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
 
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Sucessful Message
+        run: echo "### Preview for ${{ matrix.color }} is ready! 🚀" >> $GITHUB_STEP_SUMMARY echo "🔗 [Click here to view](${{ steps.vercel_deploy.outputs.preview_url }})" >> $GITHUB_STEP_SUMMARY
