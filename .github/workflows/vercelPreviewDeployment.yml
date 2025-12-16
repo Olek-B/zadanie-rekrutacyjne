@@ -61,8 +61,10 @@ jobs:
 
       - name: Run Payload Migrations Once
 
-        run: if [ ${{ matrix.theme_color }} == "ff0000" ]; then npm run payload migrate fi
-
+        run: |
+          if [ "${{ matrix.theme_color }}" == "ff0000" ]; then
+            npm run payload migrate
+          fi
       - name: add envirement variables
         run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=${{ matrix.theme_color }}" >> .env
 
