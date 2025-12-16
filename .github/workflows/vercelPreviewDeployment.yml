@@ -33,6 +33,8 @@ jobs:
           set +a
       - name: Run Payload Migrations
         run: npm run payload migrate
+      - name: Set background color
+        run: NEXT_PUBLIC_STARTUP_BACKGROUND="#fffae6"
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
