@@ -21,19 +21,37 @@ jobs:
 
       - run: npm install --global vercel@latest payload@latest
 
-      - run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      
-      - name: Pull Vercel env vars
+      - name: Pull Vercel project settings (preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Pull Vercel env vars (preview) to .env
         run: vercel env pull .env --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Load env vars into GitHub Actions environment
+        run: |
+          # Append the pulled .env into $GITHUB_ENV so subsequent steps can access them via ${{ env.NAME }}
+          if [ -f .env ]; then
+            cat .env >> $GITHUB_ENV
+          else
+            echo ".env not found after vercel env pull"
+          fi
 
-      - name: Load env vars
-        run: cat .env >> $GITHUB_ENV
+      - name: Run database migrations
+        run: payload migrate
 
-      - run: payload migrate
+      # Optional: If you want to provide a fallback build-time value inside the CI (not recommended for secrets),
+      # you can uncomment the next line or set the value in the Vercel Dashboard.
+      # - run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=#ffff00" >> $GITHUB_ENV
 
-      - run: echo "NEXT_PUBLIC_STARTUP_BACKGROUND=#ff00" >> $GITHUB_ENV
+      - name: Build (with explicit env passed)
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          # Ensure NEXT_PUBLIC_STARTUP_BACKGROUND is present in the build environment.
+          # This value comes from the .env pulled earlier and loaded into $GITHUB_ENV.
+          NEXT_PUBLIC_STARTUP_BACKGROUND: ${{ env.NEXT_PUBLIC_STARTUP_BACKGROUND }}
+          # If you rely on other pulled environment variables during build, you can pass them here too:
+          # ANOTHER_VAR: ${{ env.ANOTHER_VAR }}
 
-      - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy (prebuilt)
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        # The deploy step will use the built output. Vercel runtime envs are configured in the Vercel dashboard.
