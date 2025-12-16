@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           <Header />
           {children}
-          <h1>czy kolor istneje</h1>
+          <h1>kolor nie istneje</h1>
           <Footer />
         </Providers>
       </body>
