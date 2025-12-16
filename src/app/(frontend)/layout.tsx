@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           <Header />
           {children}
-          <h1>pls</h1>
+          <h1>{startupBg}</h1>
           <Footer />
         </Providers>
       </body>
