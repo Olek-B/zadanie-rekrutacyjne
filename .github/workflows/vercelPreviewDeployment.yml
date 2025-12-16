@@ -73,7 +73,9 @@ jobs:
 
       - name: Deploy Project Artifacts to Vercel
         id: vercel_deploy
-        run: DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tail -n 1)
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tail -n 1)
+          echo "preview_url=$DEPLOY_URL" >> $GITHUB_STEP_SUMMARY
 
       - name: Deploy Sucessful Message
-        run: echo "### Preview for ${{ matrix.color }} is ready! 🚀" >> $GITHUB_STEP_SUMMARY echo "🔗 [Click here to view](${{ steps.vercel_deploy.outputs.preview_url }})" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Preview for ${{ matrix.color }} is ready! 🚀" >> $GITHUB_STEP_SUMMARY
