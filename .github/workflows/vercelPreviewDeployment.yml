@@ -29,11 +29,37 @@ jobs:
 
       - name: Load env vars into GitHub Actions environment
         run: |
+          # Append only valid KEY=VALUE lines from the pulled .env into $GITHUB_ENV.
+          # The Vercel CLI may add comment lines (e.g. "# Created by Vercel CLI") or
+          # other non KEY=VALUE lines which are not valid for $GITHUB_ENV and will
+          # cause errors like "Invalid format".
+          #
+          # Processing steps:
+          #  - Remove BOM if present
+          #  - Strip any leading "export " prefixes
+          #  - Trim leading/trailing whitespace
+          #  - Remove blank lines and comment lines
+          #  - Only keep lines that start with a valid env var identifier followed by '='
           if [ -f .env ]; then
-            cat .env >> $GITHUB_ENV
+            # Use a pipeline of tools to sanitize the .env content before appending.
+            sed -E '1s/^\xEF\xBB\xBF//' .env \
+              | sed -E 's/^[[:space:]]*export[[:space:]]+//I' \
+              | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' \
+              | grep -v -E '^[[:space:]]*#' \
+              | sed '/^[[:space:]]*$/d' \
+              | grep -E '^[A-Za-z_][A-Za-z0-9_]*=' \
+              >> $GITHUB_ENV
           else
             echo ".env not found after vercel env pull"
           fi
+
+      - name: Optional debug: list loaded env keys (non-sensitive)
+        if: always()
+        run: |
+          # List the keys we've loaded into the environment for debugging purposes.
+          # Avoid printing values to prevent accidental secret leakage.
+          echo "Loaded env keys from .env (showing names only):"
+          grep -Eo '^[A-Za-z_][A-Za-z0-9_]*=' .env | sed 's/=$//' | sort | uniq || true
 
       - name: Run database migrations
         run: payload migrate
@@ -48,7 +74,7 @@ jobs:
           # Ensure NEXT_PUBLIC_STARTUP_BACKGROUND is present in the build environment.
           # This value comes from the .env pulled earlier and loaded into $GITHUB_ENV.
           NEXT_PUBLIC_STARTUP_BACKGROUND: ${{ env.NEXT_PUBLIC_STARTUP_BACKGROUND }}
-          # If you rely on other pulled environment variables during build, you can pass them here too:
+          # Add other build-time environment variables here as needed:
           # ANOTHER_VAR: ${{ env.ANOTHER_VAR }}
 
       - name: Deploy (prebuilt)
